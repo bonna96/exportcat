@@ -1,0 +1,85 @@
+<aside class="facet-sidebar" id="facet-sidebar" role="complementary" aria-label="Filter products">
+  <div class="facet-header">
+    <h3><i data-lucide="sliders-horizontal"></i> Filters</h3>
+    <a href="<%= typeof locale !== 'undefined' ? '/' + locale + '/' + (typeof category !== 'undefined' && category ? 'categories/' + category.slug : 'search') : '#' %>" class="facet-clear" id="clear-filters-btn">Clear All</a>
+  </div>
+
+  <% if (typeof facets !== 'undefined' && facets) { %>
+    
+    <!-- Materials -->
+    <% if (facets.materials && facets.materials.length > 0) { %>
+      <div class="facet-group" data-facet="material">
+        <button class="facet-toggle" aria-expanded="true">
+          <span>Materials</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="facet-options">
+          <% facets.materials.slice(0, 10).forEach(function(m) { %>
+            <label class="facet-option">
+              <input 
+                type="checkbox" 
+                name="material" 
+                value="<%= m.key %>"
+                <%= (typeof query !== 'undefined' && query.material && [].concat(query.material).includes(m.key)) ? 'checked' : '' %>
+                data-facet-filter
+              >
+              <span class="facet-label"><%= m.key %></span>
+              <span class="facet-count"><%= m.doc_count %></span>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+    
+    <!-- Certifications -->
+    <% if (facets.certifications && facets.certifications.length > 0) { %>
+      <div class="facet-group" data-facet="certification">
+        <button class="facet-toggle" aria-expanded="true">
+          <span>Certifications</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="facet-options">
+          <% facets.certifications.slice(0, 10).forEach(function(c) { %>
+            <label class="facet-option">
+              <input 
+                type="checkbox" 
+                name="certification" 
+                value="<%= c.key %>"
+                <%= (typeof query !== 'undefined' && query.certification && [].concat(query.certification).includes(c.key)) ? 'checked' : '' %>
+                data-facet-filter
+              >
+              <span class="facet-label"><%= c.key %></span>
+              <span class="facet-count"><%= c.doc_count %></span>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+    
+    <!-- Origin Country -->
+    <% if (facets.origins && facets.origins.length > 0) { %>
+      <div class="facet-group" data-facet="origin">
+        <button class="facet-toggle" aria-expanded="true">
+          <span>Origin Country</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="facet-options">
+          <% facets.origins.forEach(function(o) { %>
+            <label class="facet-option">
+              <input 
+                type="checkbox" 
+                name="origin" 
+                value="<%= o.key %>"
+                <%= (typeof query !== 'undefined' && query.origin === o.key) ? 'checked' : '' %>
+                data-facet-filter
+              >
+              <span class="facet-label"><%= o.key %></span>
+              <span class="facet-count"><%= o.doc_count %></span>
+            </label>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+    
+  <% } %>
+</aside>

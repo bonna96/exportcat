@@ -1,0 +1,141 @@
+<!-- Hero Banner -->
+<section class="hero-banner">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+        <span>VERIFIED BANGLADESHI EXPORT PLATFORM</span>
+      </div>
+      <h1 class="hero-title">Direct B2B Sourcing from <span>Bangladesh Manufacturers</span></h1>
+      <p class="hero-subtitle">
+        Browse wholesale export products with transparent Minimum Order Quantities (MOQ), tiered FOB/CIF pricing, verified international quality certifications, and direct RFQ enquiry dispatch.
+      </p>
+      <div class="hero-actions">
+        <a href="/<%= locale %>/categories/jute-natural-fibers" class="btn btn-primary btn-lg">
+          <i data-lucide="package"></i> Explore Catalogue
+        </a>
+        <a href="/<%= locale %>/search" class="btn btn-outline btn-lg" style="color: #ffffff; border-color: rgba(255,255,255,0.3);">
+          <i data-lucide="search"></i> Advanced Search
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <h3><%= totalProducts || 120 %>+</h3>
+          <p>Export-Ready SKUs</p>
+        </div>
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>Verified Compliant Mills</p>
+        </div>
+        <div class="stat-item">
+          <h3>50+</h3>
+          <p>Destination Markets</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding-top: 4rem; padding-bottom: 4rem;">
+  <!-- Export Categories Grid -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Major Export Sectors</h2>
+      <p>Explore high-volume manufacturing sectors ready for container-load delivery.</p>
+    </div>
+    <a href="/<%= locale %>/search" class="btn btn-outline btn-sm">
+      View All <i data-lucide="arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="category-grid">
+    <% if (categories && categories.length > 0) { %>
+      <% categories.forEach(function(cat) { %>
+        <a href="/<%= locale %>/categories/<%= cat.slug %>" class="category-card">
+          <div>
+            <div class="category-icon">
+              <i data-lucide="folder"></i>
+            </div>
+            <h3><%= cat.name %></h3>
+            <p class="category-desc"><%= cat.description || 'Export grade manufacturing and commodities.' %></p>
+          </div>
+          <div class="category-footer">
+            <span><%= cat._count && typeof cat._count.products !== 'undefined' ? cat._count.products : 10 %> Products</span>
+            <i data-lucide="chevron-right"></i>
+          </div>
+        </a>
+      <% }); %>
+    <% } %>
+  </div>
+
+  <!-- Featured Wholesale Products -->
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Featured Export Products</h2>
+      <p>Recently certified and high-demand export lots available for immediate RFQ.</p>
+    </div>
+    <a href="/<%= locale %>/search" class="btn btn-outline btn-sm">
+      Browse All Products <i data-lucide="arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="products-grid">
+    <% if (featuredProducts && featuredProducts.length > 0) { %>
+      <% featuredProducts.forEach(function(prod) { %>
+        <article class="product-card">
+          <div class="product-thumb">
+            <% if (prod.images && prod.images.length > 0) { %>
+              <% const imgSrc = prod.images[0].webpUrl || prod.images[0].originalUrl || prod.images[0].url; %>
+              <img src="<%= imgSrc.startsWith('/') ? imgSrc : '/' + imgSrc %>" alt="<%= prod.name %>" loading="lazy">
+            <% } else { %>
+              <div class="product-placeholder">
+                <i data-lucide="package" style="width: 48px; height: 48px;"></i>
+                <span>Export Product</span>
+              </div>
+            <% } %>
+            <span class="product-badge-origin"><%= prod.originCountry || 'Bangladesh' %></span>
+          </div>
+          
+          <div class="product-body">
+            <% if (prod.category) { %>
+              <div class="product-category-name"><%= prod.category.name %></div>
+            <% } %>
+            <h3 class="product-title">
+              <a href="/<%= locale %>/products/<%= prod.slug %>"><%= prod.name %></a>
+            </h3>
+            
+            <div class="product-specs">
+              <% if (prod.materials && prod.materials.length > 0) { %>
+                <span class="spec-chip"><%= prod.materials[0] %></span>
+              <% } %>
+              <% if (prod.certifications && prod.certifications.length > 0) { %>
+                <span class="spec-chip"><%= prod.certifications[0] %></span>
+              <% } %>
+            </div>
+
+            <div class="product-pricing">
+              <div class="price-box">
+                <span class="price-label">FOB Price</span>
+                <% const basePrice = prod.priceBrackets && prod.priceBrackets.length > 0 ? (prod.priceBrackets[0].priceUsd || prod.priceBrackets[0].unitPrice || 15.0) : 15.0; %>
+                <span class="price-value" data-usd-price="<%= basePrice %>">$<%= Number(basePrice).toFixed(2) %></span>
+                <span style="font-size: 0.75rem; color: #64748b;">/ <%= prod.unit || 'pc' %></span>
+              </div>
+              <div class="moq-tag">
+                MOQ: <%= prod.moq ? prod.moq.toLocaleString() : '500' %> <%= prod.unit || 'pcs' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-actions">
+            <a href="/<%= locale %>/products/<%= prod.slug %>" class="btn btn-outline btn-sm">
+              <i data-lucide="eye"></i> Details
+            </a>
+            <a href="/<%= locale %>/products/<%= prod.slug %>#rfq" class="btn btn-primary btn-sm">
+              <i data-lucide="send"></i> Request Quote
+            </a>
+          </div>
+        </article>
+      <% }); %>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+  <div class="dashboard-header">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h1>Site Administrator Dashboard</h1>
+        <span class="role-tag role-ADMIN">ADMIN PORTAL</span>
+      </div>
+      <p style="margin-top: 0.25rem;">Platform administration, RBAC permissions, audit trail logging, and SEO controls.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/robots.txt" target="_blank" class="btn btn-outline btn-sm">
+        <i data-lucide="file-text"></i> robots.txt
+      </a>
+      <a href="/sitemap-index.xml" target="_blank" class="btn btn-outline btn-sm">
+        <i data-lucide="map"></i> XML Sitemaps
+      </a>
+      <a href="/logout" class="btn btn-outline btn-sm">
+        <i data-lucide="log-out"></i> Sign Out
+      </a>
+    </div>
+  </div>
+
+  <!-- Platform Overview KPIs -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-title">REGISTERED USERS</div>
+      <div class="stat-card-value"><%= stats ? stats.userCount : (users ? users.length : 0) %></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">CATALOGUE PRODUCTS</div>
+      <div class="stat-card-value" style="color: #1e3a8a;"><%= stats ? stats.productCount : 0 %></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">TOTAL RFQ ENQUIRIES</div>
+      <div class="stat-card-value" style="color: #059669;"><%= stats ? stats.enquiryCount : 0 %></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">TOTAL SEARCH TRANSACTIONS</div>
+      <div class="stat-card-value" style="color: #2563eb;"><%= stats ? stats.searchCount : 0 %></div>
+    </div>
+  </div>
+
+  <!-- User Management Table -->
+  <div class="data-table-wrap">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+      <h3>User Role & Access Control (RBAC)</h3>
+      <span style="font-size: 0.8125rem; color: #64748b;">FR-15: Administrator Privileges</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email Address</th>
+          <th>Assigned Role</th>
+          <th>Account Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (users && users.length > 0) { %>
+          <% users.forEach(function(u) { %>
+            <tr>
+              <td><strong><%= u.name %></strong></td>
+              <td><code><%= u.email %></code></td>
+              <td><span class="role-tag role-<%= u.role %>"><%= u.role %></span></td>
+              <td>
+                <span class="badge <%= u.isActive ? 'badge-published' : 'badge-draft' %>">
+                  <%= u.isActive ? 'Active' : 'Disabled' %>
+                </span>
+              </td>
+              <td>
+                <select onchange="updateUserRole('<%= u.id %>', this.value)" class="currency-select" style="font-size: 0.75rem;">
+                  <option value="ADMIN" <%= u.role === 'ADMIN' ? 'selected' : '' %>>Admin</option>
+                  <option value="MANAGER" <%= u.role === 'MANAGER' ? 'selected' : '' %>>Manager</option>
+                  <option value="ANALYST" <%= u.role === 'ANALYST' ? 'selected' : '' %>>Analyst</option>
+                  <option value="BUYER" <%= u.role === 'BUYER' ? 'selected' : '' %>>Buyer</option>
+                </select>
+              </td>
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Audit Trail Logs -->
+  <div class="data-table-wrap">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0;">
+      <h3>Recent Security & Operations Audit Logs</h3>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Entity</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (recentLogs && recentLogs.length > 0) { %>
+          <% recentLogs.forEach(function(log) { %>
+            <tr>
+              <td style="color: #64748b; font-size: 0.75rem;"><%= new Date(log.createdAt).toLocaleString() %></td>
+              <td><strong><%= log.user ? log.user.name : 'System' %></strong></td>
+              <td><span class="spec-chip"><%= log.action %></span></td>
+              <td><%= log.entityType %></td>
+              <td style="max-width: 300px; font-size: 0.8125rem;"><%= JSON.stringify(log.details || {}) %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" style="text-align: center; color: #94a3b8; padding: 2rem;">No audit logs recorded yet.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+async function updateUserRole(userId, newRole) {
+  try {
+    const res = await fetch(`/api/v1/users/${userId}/role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: newRole })
+    });
+    if (res.ok) {
+      alert('User role updated to ' + newRole);
+    } else {
+      alert('Failed to update role');
+    }
+  } catch (err) {
+    alert('Network error');
+  }
+}
+</script>

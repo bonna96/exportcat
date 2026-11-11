@@ -1,0 +1,83 @@
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem; max-width: 540px;">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #eff6ff; border-radius: 12px; color: #1e3a8a; margin-bottom: 1rem;">
+        <i data-lucide="package" style="width: 32px; height: 32px;"></i>
+      </div>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">ExportCat Portal</h1>
+      <p style="font-size: 0.875rem; color: #64748b;">
+        Sign in to access your role-specific catalogue management, IR analytics, or wholesale order tools.
+      </p>
+    </div>
+
+    <!-- Academic Metadata Badge -->
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.875rem; margin-bottom: 2rem; font-size: 0.75rem; color: #475569; line-height: 1.5;">
+      <strong>Course:</strong> Information Retrieval & Search Engine Optimization<br>
+      <strong>Student:</strong> Suria Hossain Bonna (Roll: 22CSE006) — 4th Year, 1st Sem<br>
+      <strong>Supervisor:</strong> Dr. Tania Islam, Asst. Professor, Dept. of CSE, Univ. of Barishal
+    </div>
+
+    <!-- Quick Demo Login Switcher -->
+    <div style="margin-bottom: 2rem;">
+      <label class="form-label" style="font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.75rem; display: block;">
+        ⚡ Instant Demo Access (One-Click)
+      </label>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <form action="/login" method="POST">
+          <input type="hidden" name="email" value="admin@exportcat.com">
+          <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; border-color: #fca5a5; background: #fef2f2; color: #991b1b; font-weight: 600;">
+            <i data-lucide="shield" style="width: 14px; height: 14px;"></i> Admin
+          </button>
+        </form>
+        <form action="/login" method="POST">
+          <input type="hidden" name="email" value="manager@exportcat.com">
+          <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; border-color: #93c5fd; background: #eff6ff; color: #1e40af; font-weight: 600;">
+            <i data-lucide="layers" style="width: 14px; height: 14px;"></i> Manager
+          </button>
+        </form>
+        <form action="/login" method="POST">
+          <input type="hidden" name="email" value="analyst@exportcat.com">
+          <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; border-color: #fde68a; background: #fffbeb; color: #92400e; font-weight: 600;">
+            <i data-lucide="bar-chart-2" style="width: 14px; height: 14px;"></i> Analyst
+          </button>
+        </form>
+        <form action="/login" method="POST">
+          <input type="hidden" name="email" value="buyer@exportcat.com">
+          <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; border-color: #6ee7b7; background: #ecfdf5; color: #065f46; font-weight: 600;">
+            <i data-lucide="shopping-cart" style="width: 14px; height: 14px;"></i> Buyer
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div style="position: relative; text-align: center; margin-bottom: 2rem;">
+      <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e2e8f0;"></div>
+      <span style="position: relative; background: #ffffff; padding: 0 0.75rem; font-size: 0.8125rem; color: #94a3b8;">or sign in with email</span>
+    </div>
+
+    <!-- Standard Login Form -->
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label class="form-label">Corporate Email Address</label>
+        <input type="email" name="email" class="form-control" placeholder="name@exportcat.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" value="demo1234">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.5rem;">
+        Sign In to Platform
+      </button>
+    </form>
+
+    <div style="margin-top: 2rem; text-align: center;">
+      <a href="/en-gb" style="font-size: 0.875rem; color: #64748b;">
+        <i data-lucide="arrow-left" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Return to Public Catalogue
+      </a>
+    </div>
+
+  </div>
+</div>

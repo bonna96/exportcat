@@ -1,0 +1,80 @@
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <a href="/<%= locale %>" class="logo" aria-label="ExportCat Home">
+      <i data-lucide="package" class="logo-icon"></i>
+      <span class="logo-text">Export<span class="logo-accent">Cat</span></span>
+    </a>
+    
+    <!-- Search Bar -->
+    <div class="header-search" id="header-search">
+      <form action="/<%= locale %>/search" method="GET" class="search-form" role="search">
+        <div class="search-input-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input 
+            type="search" 
+            name="q" 
+            id="search-input"
+            placeholder="Search products, materials, certifications..." 
+            autocomplete="off"
+            aria-label="Search products"
+          >
+          <div id="autocomplete-dropdown" class="autocomplete-dropdown" hidden></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-search">Search</button>
+      </form>
+    </div>
+    
+    <!-- Navigation & Currency Tools -->
+    <nav class="header-nav" role="navigation" aria-label="Main navigation" style="display: flex; align-items: center; gap: 1rem;">
+      <select id="currency-selector" class="currency-select" aria-label="Select Currency">
+        <option value="USD">USD ($)</option>
+        <option value="EUR">EUR (€)</option>
+        <option value="GBP">GBP (£)</option>
+        <option value="JPY">JPY (¥)</option>
+        <option value="BDT">BDT (৳)</option>
+      </select>
+
+      <a href="/<%= locale %>" class="nav-link">
+        <i data-lucide="home" class="nav-icon"></i>
+        <span>Home</span>
+      </a>
+      
+      <% if (user) { %>
+        <% if (user.role === 'ADMIN') { %>
+          <a href="/admin/dashboard" class="nav-link">
+            <i data-lucide="shield" class="nav-icon"></i>
+            <span>Admin</span>
+          </a>
+        <% } %>
+        <% if (user.role === 'MANAGER' || user.role === 'ADMIN') { %>
+          <a href="/manager/dashboard" class="nav-link">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
+            <span>Manager</span>
+          </a>
+        <% } %>
+        <% if (user.role === 'ANALYST' || user.role === 'ADMIN') { %>
+          <a href="/analyst/dashboard" class="nav-link">
+            <i data-lucide="bar-chart-3" class="nav-icon"></i>
+            <span>Analyst</span>
+          </a>
+        <% } %>
+        <div class="user-menu" style="position: relative;">
+          <a href="/logout" class="btn btn-outline btn-sm" title="Sign out <%= user.name %>">
+            <i data-lucide="log-out" class="nav-icon" style="width: 14px; height: 14px;"></i>
+            <span><%= user.name.split(' ')[0] %></span>
+          </a>
+        </div>
+      <% } else { %>
+        <a href="/login" class="nav-link btn btn-outline-light">
+          <i data-lucide="log-in" class="nav-icon"></i>
+          <span>Sign In</span>
+        </a>
+      <% } %>
+    </nav>
+    
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+      <i data-lucide="menu"></i>
+    </button>
+  </div>
+</header>

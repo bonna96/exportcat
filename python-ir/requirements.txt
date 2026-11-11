@@ -1,0 +1,2 @@
+# ExportCat Academic IR & SEO Python Dependencies
+# Pure standard library is prioritized for zero-setup execution.

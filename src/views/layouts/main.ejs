@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title><%= typeof title !== 'undefined' ? title : 'ExportCat — B2B Export Catalogue' %></title>
+  
+  <% if (typeof seo !== 'undefined' && seo) { %>
+    <meta name="description" content="<%= seo.metaDescription || '' %>">
+    <meta name="robots" content="<%= seo.robots || 'index, follow' %>">
+    <link rel="canonical" href="<%= seo.canonical || '' %>">
+    
+    <% if (seo.hreflangTags && seo.hreflangTags.length > 0) { %>
+      <% seo.hreflangTags.forEach(function(tag) { %>
+        <link rel="alternate" hreflang="<%= tag.hreflang %>" href="<%= tag.href %>">
+      <% }); %>
+    <% } %>
+    
+    <% if (seo.jsonLd) { %>
+      <% if (Array.isArray(seo.jsonLd)) { %>
+        <% seo.jsonLd.forEach(function(ld) { %>
+          <script type="application/ld+json"><%- JSON.stringify(ld) %></script>
+        <% }); %>
+      <% } else { %>
+        <script type="application/ld+json"><%- JSON.stringify(seo.jsonLd) %></script>
+      <% } %>
+    <% } %>
+  <% } %>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <%- include('../partials/header', { user: typeof user !== 'undefined' ? user : null, locale: typeof locale !== 'undefined' ? locale : 'en-gb' }) %>
+  
+  <main id="main-content">
+    <%- body %>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i data-lucide="package" class="footer-logo-icon"></i>
+            <span>ExportCat</span>
+          </div>
+          <p class="footer-desc">B2B Export Product Catalogue — Connecting Bangladeshi manufacturers with global buyers.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/categories/jute-natural-fibers">Jute & Natural Fibers</a></li>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/categories/textiles-fabrics">Textiles & Fabrics</a></li>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/categories/leather-goods">Leather Goods</a></li>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/categories/garments-apparel">Garments & Apparel</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>For Buyers</h4>
+          <ul>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/search">Search Products</a></li>
+            <li><a href="/<%= typeof locale !== 'undefined' ? locale : 'en-gb' %>/compare">Compare Products</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="/login">Sign In</a></li>
+            <li><a href="/sitemap-index.xml">Sitemap</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 ExportCat — Academic Project by Suria Hossain Bonna, University of Barishal</p>
+        <p class="footer-course">Information Retrieval & Search Engine Optimization — 4th Year, 1st Semester</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Client-side scripts -->
+  <script src="/js/search-autocomplete.js"></script>
+  <script src="/js/ajax-filters.js"></script>
+  <script src="/js/unit-currency.js"></script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

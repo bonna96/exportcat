@@ -1,0 +1,332 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User & Authentication ─────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN       // Site Administrator
+  MANAGER     // Catalogue Manager
+  ANALYST     // Search & SEO Analyst
+  BUYER       // Buyer
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String
+  role          UserRole        @default(BUYER)
+  supabaseUid   String?         @unique @map("supabase_uid")
+  avatar        String?
+  isActive      Boolean         @default(true) @map("is_active")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  managedProducts Product[]     @relation("ManagedBy")
+  enquiries       QuoteEnquiry[] @relation("BuyerEnquiries")
+  auditLogs       AuditLog[]
+  searchLogs      SearchQueryLog[]
+
+  @@map("users")
+}
+
+// ─── Category ───────────────────────────────────────────────────────────────────
+
+model Category {
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  name          String
+  description   String?
+  parentId      String?         @map("parent_id")
+  sortOrder     Int             @default(0) @map("sort_order")
+  isActive      Boolean         @default(true) @map("is_active")
+  metaTitle     String?         @map("meta_title")
+  metaDesc      String?         @map("meta_desc")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Self-referential relation
+  parent        Category?       @relation("CategoryTree", fields: [parentId], references: [id])
+  children      Category[]      @relation("CategoryTree")
+
+  // Relations
+  products      Product[]
+  translations  CategoryTranslation[]
+  facetRules    FacetRule[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id            String          @id @default(cuid())
+  categoryId    String          @map("category_id")
+  locale        String          // e.g., "en-gb", "de-de"
+  name          String
+  description   String?
+  metaTitle     String?         @map("meta_title")
+  metaDesc      String?         @map("meta_desc")
+
+  category      Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+  @@map("category_translations")
+}
+
+// ─── Product ────────────────────────────────────────────────────────────────────
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  REDIRECTED
+}
+
+model Product {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  sku             String          @unique
+  name            String
+  description     String?
+  shortDesc       String?         @map("short_desc")
+  categoryId      String          @map("category_id")
+  managerId       String?         @map("manager_id")
+  status          ProductStatus   @default(DRAFT)
+  redirectSlug    String?         @map("redirect_slug")
+
+  // B2B-specific fields
+  moq             Int             @default(1) // Minimum Order Quantity
+  leadTimeDays    Int?            @map("lead_time_days")
+  originCountry   String?         @map("origin_country")
+  hsCode          String?         @map("hs_code")       // Harmonised System code
+
+  // Specifications
+  materials       String[]        @default([])
+  certifications  String[]        @default([])           // e.g., "ISO 9001", "OEKO-TEX"
+  weight          Float?                                  // in kg
+  weightUnit      String          @default("kg") @map("weight_unit")
+  dimensions      String?                                // e.g., "100x50x25 cm"
+
+  // SEO fields
+  metaTitle       String?         @map("meta_title")
+  metaDesc        String?         @map("meta_desc")
+  canonicalUrl    String?         @map("canonical_url")
+
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  publishedAt     DateTime?       @map("published_at")
+
+  // Relations
+  category        Category        @relation(fields: [categoryId], references: [id])
+  manager         User?           @relation("ManagedBy", fields: [managerId], references: [id])
+  variants        Variant[]
+  priceBrackets   PriceBracket[]
+  images          ProductImage[]
+  translations    ProductTranslation[]
+  enquiries       QuoteEnquiry[]
+  supplier        Supplier?       @relation(fields: [supplierId], references: [id])
+  supplierId      String?         @map("supplier_id")
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([slug])
+  @@map("products")
+}
+
+model ProductTranslation {
+  id            String          @id @default(cuid())
+  productId     String          @map("product_id")
+  locale        String
+  name          String
+  description   String?
+  shortDesc     String?         @map("short_desc")
+  metaTitle     String?         @map("meta_title")
+  metaDesc      String?         @map("meta_desc")
+
+  product       Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locale])
+  @@map("product_translations")
+}
+
+// ─── Variant ────────────────────────────────────────────────────────────────────
+
+model Variant {
+  id            String          @id @default(cuid())
+  productId     String          @map("product_id")
+  sku           String          @unique
+  name          String                                   // e.g., "Natural - 350 GSM"
+  attributes    Json            @default("{}")            // e.g., { "color": "Natural", "gsm": "350" }
+  stock         Int             @default(0)
+  isActive      Boolean         @default(true) @map("is_active")
+
+  product       Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  priceBrackets PriceBracket[]
+
+  @@map("variants")
+}
+
+// ─── Wholesale Price Bracket ────────────────────────────────────────────────────
+
+model PriceBracket {
+  id            String          @id @default(cuid())
+  productId     String          @map("product_id")
+  variantId     String?         @map("variant_id")
+  minQty        Int             @map("min_qty")
+  maxQty        Int?            @map("max_qty")
+  priceUsd      Float           @map("price_usd")
+  currency      String          @default("USD")
+
+  product       Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant       Variant?        @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("price_brackets")
+}
+
+// ─── Product Image ──────────────────────────────────────────────────────────────
+
+model ProductImage {
+  id            String          @id @default(cuid())
+  productId     String          @map("product_id")
+  originalUrl   String          @map("original_url")
+  avifUrl       String?         @map("avif_url")
+  webpUrl       String?         @map("webp_url")
+  altText       String?         @map("alt_text")
+  width         Int?
+  height        Int?
+  sortOrder     Int             @default(0) @map("sort_order")
+  isPrimary     Boolean         @default(false) @map("is_primary")
+
+  product       Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_images")
+}
+
+// ─── Supplier ───────────────────────────────────────────────────────────────────
+
+model Supplier {
+  id            String          @id @default(cuid())
+  name          String
+  country       String
+  contactEmail  String?         @map("contact_email")
+  website       String?
+  certifications String[]       @default([])
+  isVerified    Boolean         @default(false) @map("is_verified")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  products      Product[]
+
+  @@map("suppliers")
+}
+
+// ─── Facet & SEO Rules ──────────────────────────────────────────────────────────
+
+enum FacetAction {
+  INDEX                  // Allow indexing
+  CANONICAL_TO_PARENT    // Canonical to parent (unfaceted) URL
+  NOINDEX                // Add noindex tag
+  BLOCKED                // Block in robots.txt
+}
+
+model FacetRule {
+  id            String          @id @default(cuid())
+  categoryId    String?         @map("category_id")
+  facetKey      String          @map("facet_key")         // e.g., "material", "certification"
+  maxCombinations Int           @default(2) @map("max_combinations")
+  action        FacetAction     @default(CANONICAL_TO_PARENT)
+  isActive      Boolean         @default(true) @map("is_active")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  category      Category?       @relation(fields: [categoryId], references: [id])
+
+  @@unique([categoryId, facetKey])
+  @@map("facet_rules")
+}
+
+// ─── Synonym Rules ──────────────────────────────────────────────────────────────
+
+model SynonymRule {
+  id            String          @id @default(cuid())
+  locale        String          @default("en-gb")
+  synonyms      String[]        // e.g., ["jute", "hessian", "burlap"]
+  isActive      Boolean         @default(true) @map("is_active")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  @@map("synonym_rules")
+}
+
+// ─── Quote / RFQ Enquiry ────────────────────────────────────────────────────────
+
+enum EnquiryStatus {
+  PENDING
+  RESPONDED
+  CLOSED
+}
+
+model QuoteEnquiry {
+  id            String          @id @default(cuid())
+  productId     String          @map("product_id")
+  buyerId       String?         @map("buyer_id")
+  buyerName     String          @map("buyer_name")
+  buyerEmail    String          @map("buyer_email")
+  buyerCompany  String?         @map("buyer_company")
+  buyerCountry  String?         @map("buyer_country")
+  quantity      Int
+  message       String?
+  status        EnquiryStatus   @default(PENDING)
+  respondedAt   DateTime?       @map("responded_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  product       Product         @relation(fields: [productId], references: [id])
+  buyer         User?           @relation("BuyerEnquiries", fields: [buyerId], references: [id])
+
+  @@map("quote_enquiries")
+}
+
+// ─── Search Query Log ───────────────────────────────────────────────────────────
+
+model SearchQueryLog {
+  id            String          @id @default(cuid())
+  query         String
+  locale        String          @default("en-gb")
+  resultCount   Int             @map("result_count")
+  userId        String?         @map("user_id")
+  sessionId     String?         @map("session_id")
+  responseTimeMs Int?           @map("response_time_ms")
+  facetsUsed    Json?           @map("facets_used")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  user          User?           @relation(fields: [userId], references: [id])
+
+  @@index([query])
+  @@index([createdAt])
+  @@map("search_query_logs")
+}
+
+// ─── Audit Log ──────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id            String          @id @default(cuid())
+  userId        String          @map("user_id")
+  action        String          // e.g., "product.create", "product.publish"
+  entityType    String          @map("entity_type")
+  entityId      String          @map("entity_id")
+  changes       Json?
+  ipAddress     String?         @map("ip_address")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  user          User            @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

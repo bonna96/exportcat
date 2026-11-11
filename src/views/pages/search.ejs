@@ -1,0 +1,133 @@
+<%- include('../partials/breadcrumbs', { breadcrumbs, locale }) %>
+
+<div class="container" style="padding-bottom: 4rem;">
+  <div style="margin-bottom: 2.5rem;">
+    <h1>Search Catalogue</h1>
+    <p style="margin-top: 0.5rem; font-size: 1.0625rem;">
+      Full-text BM25 search across export product specifications, materials, and HS codes.
+    </p>
+
+    <!-- Search input -->
+    <form action="/<%= locale %>/search" method="GET" style="max-width: 700px; margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+      <input type="text" name="q" value="<%= query || '' %>" placeholder="Search keywords: jute, organic cotton, bovine leather, china porcelain..." class="form-control" style="font-size: 1rem; padding: 0.75rem 1.25rem; border-radius: 9999px;">
+      <button type="submit" class="btn btn-primary" style="padding: 0 1.75rem; border-radius: 9999px;">
+        <i data-lucide="search"></i> Search
+      </button>
+    </form>
+  </div>
+
+  <% if (query) { %>
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; background: #ffffff; padding: 1rem 1.25rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <div>
+        Results for: <strong style="color: #1e3a8a;">"<%= query %>"</strong> — 
+        Found <strong><%= results ? results.total : 0 %></strong> export products
+        <% if (results && results.tookMs) { %>
+          <span style="font-size: 0.75rem; color: #94a3b8; margin-left: 0.5rem;">(<%= results.tookMs %>ms BM25 latency)</span>
+        <% } %>
+      </div>
+      <div>
+        <a href="/<%= locale %>/compare" class="btn btn-outline btn-sm">
+          <i data-lucide="columns"></i> Compare Selected
+        </a>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="catalog-layout">
+    <!-- Facet Sidebar -->
+    <%- include('../partials/facet-sidebar', { facets: results ? results.facets : {}, query: { q: query }, locale, category: null }) %>
+
+    <!-- Search Results Grid -->
+    <section>
+      <% if (results && results.products && results.products.length > 0) { %>
+        <div class="products-grid">
+          <% results.products.forEach(function(prod) { %>
+            <article class="product-card">
+              <div class="product-thumb">
+                <% if (prod.images && prod.images.length > 0) { %>
+                  <img src="/<%= prod.images[0].url %>" alt="<%= prod.name %>" loading="lazy">
+                <% } else { %>
+                  <div class="product-placeholder">
+                    <i data-lucide="package" style="width: 48px; height: 48px;"></i>
+                    <span>Export Product</span>
+                  </div>
+                <% } %>
+                <span class="product-badge-origin"><%= prod.originCountry || 'Bangladesh' %></span>
+              </div>
+              
+              <div class="product-body">
+                <% if (prod.category) { %>
+                  <div class="product-category-name"><%= prod.category.name %></div>
+                <% } %>
+                <h3 class="product-title">
+                  <a href="/<%= locale %>/products/<%= prod.slug %>"><%= prod.name %></a>
+                </h3>
+                
+                <div class="product-specs">
+                  <% if (prod.materials && prod.materials.length > 0) { %>
+                    <span class="spec-chip"><%= prod.materials[0] %></span>
+                  <% } %>
+                  <% if (prod.certifications && prod.certifications.length > 0) { %>
+                    <span class="spec-chip"><%= prod.certifications[0] %></span>
+                  <% } %>
+                </div>
+
+                <div class="product-pricing">
+                  <div class="price-box">
+                    <span class="price-label">FOB Price</span>
+                    <% const basePrice = prod.priceBrackets && prod.priceBrackets.length > 0 ? prod.priceBrackets[0].unitPrice : 15.0; %>
+                    <span class="price-value" data-usd-price="<%= basePrice %>">$<%= Number(basePrice).toFixed(2) %></span>
+                    <span style="font-size: 0.75rem; color: #64748b;">/ <%= prod.unit || 'pc' %></span>
+                  </div>
+                  <div class="moq-tag">
+                    MOQ: <%= prod.moq ? prod.moq.toLocaleString() : '500' %>
+                  </div>
+                </div>
+              </div>
+
+              <div class="product-actions">
+                <a href="/<%= locale %>/products/<%= prod.slug %>" class="btn btn-outline btn-sm">
+                  <i data-lucide="eye"></i> Details
+                </a>
+                <a href="/<%= locale %>/products/<%= prod.slug %>#rfq" class="btn btn-primary btn-sm">
+                  <i data-lucide="send"></i> RFQ
+                </a>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (results.totalPages && results.totalPages > 1) { %>
+          <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+            <% for (let p = 1; p <= results.totalPages; p++) { %>
+              <a href="?q=<%= encodeURIComponent(query) %>&page=<%= p %>" class="btn <%= p === results.page ? 'btn-primary' : 'btn-outline' %> btn-sm">
+                <%= p %>
+              </a>
+            <% } %>
+          </div>
+        <% } %>
+
+      <% } else if (query) { %>
+        <div style="text-align: center; padding: 4rem 2rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <i data-lucide="search-x" style="width: 56px; height: 56px; color: #94a3b8; margin: 0 auto 1rem;"></i>
+          <h3>Zero results found for "<%= query %>"</h3>
+          <p style="margin-top: 0.5rem; margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            Our search engine utilizes BM25 scoring. Check spelling or try synonymous terms (e.g. "burlap" for jute, "apparel" for garments, "hide" for leather).
+          </p>
+          <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="/<%= locale %>/categories/jute-natural-fibers" class="btn btn-outline btn-sm">Jute Products</a>
+            <a href="/<%= locale %>/categories/textiles-fabrics" class="btn btn-outline btn-sm">Textiles & Fabrics</a>
+            <a href="/<%= locale %>/categories/leather-goods" class="btn btn-outline btn-sm">Leather Goods</a>
+          </div>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 4rem 2rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
+          <i data-lucide="search" style="width: 56px; height: 56px; color: #94a3b8; margin: 0 auto 1rem;"></i>
+          <h3>Type your query above to search</h3>
+          <p style="margin-top: 0.5rem;">Explore our comprehensive wholesale catalogue by material, specification, or product name.</p>
+        </div>
+      <% } %>
+    </section>
+  </div>
+</div>

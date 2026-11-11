@@ -1,0 +1,9 @@
+# Bangladesh B2B Export Synonyms & Trade Equivalences
+jute => hessian, burlap, gunny
+cotton => jersey, twill, yarn
+leather => hide, nappa, crust, bovine
+shrimp => prawn, penaeus monodon, seafood
+dinnerware => tableware, porcelain, china, ceramic
+tea => black tea, orthodox tea, pekoe
+garments => apparel, clothing, knitwear, hoodie
+sacking => sack, bag, multiwall
