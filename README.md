@@ -170,10 +170,10 @@ BASE_URL=http://localhost:3000
 DATABASE_URL="postgresql://postgres:password@localhost:5432/exportcat?schema=public"
 
 # Supabase Auth
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-JWT_SECRET=your-jwt-secret-at-least-32-characters
+SUPABASE_URL=https://my-project.supabase.co
+SUPABASE_ANON_KEY=my-anon-key
+SUPABASE_SERVICE_ROLE_KEY=my-service-role-key
+JWT_SECRET=my-jwt-secret-at-least-32-characters
 
 # OpenSearch
 OPENSEARCH_NODE=https://localhost:9200
@@ -184,8 +184,8 @@ OPENSEARCH_INDEX_PREFIX=exportcat
 # Email (SMTP)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
+SMTP_USER=my-email@gmail.com
+SMTP_PASS=my-app-password
 SMTP_FROM="ExportCat <noreply@exportcat.com>"
 ```
 
@@ -212,7 +212,7 @@ Start the application in development mode with live-reload:
 npm run dev
 ```
 
-Visit **`http://localhost:3000`** in your browser.
+Visit **`http://localhost:3000`** in browser.
 
 ---
 
